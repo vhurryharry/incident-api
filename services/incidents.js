@@ -53,7 +53,7 @@ const mapIncident = (incident, type) => {
       mappedIncident[mapping.to] = incident[mapping.from];
     }
 
-    getIdentity(incident)
+    getIdentity(mappedIncident)
       .then((incident) => {
         resolve(incident);
       })
@@ -95,9 +95,17 @@ const mergeIncidents = (incidentsPerTypes) => {
         };
       }
 
+      // Find the position to insert the incident based on its timestamp
+      const pos = mergedIncidents[incident.employee_id][incident.priority][
+        "incidents"
+      ].findIndex((inc) => inc.timestamp > incident.timestamp);
+
       mergedIncidents[incident.employee_id][incident.priority][
         "incidents"
-      ].push(incident);
+      ].splice(pos, 0, {
+        ...incident,
+        employee_id: undefined,
+      });
       mergedIncidents[incident.employee_id][incident.priority]["count"]++;
     }
   }
