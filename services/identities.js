@@ -56,7 +56,7 @@ const getIdentities = () => {
  * @param {object} incident - incident object with `machine_ip` or `employee_id`
  * @returns Incident object with both the IP address and Employee ID filled
  */
-exports.getIdentity = (incident) => {
+const getIdentity = (incident) => {
   return new Promise((resolve, reject) => {
     getIdentities()
       .then((identities) => {
@@ -75,4 +75,9 @@ exports.getIdentity = (incident) => {
         reject(error);
       });
   });
+};
+
+module.exports = {
+  getIdentities,
+  getIdentity,
 };

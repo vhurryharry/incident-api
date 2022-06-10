@@ -1,4 +1,5 @@
 const axios = require("axios");
+const cache = require("../utils/cache");
 const config = require("../utils/config");
 const incidentTypes = require("../utils/incidentTypes");
 const { getIdentity } = require("./identities");
@@ -104,15 +105,29 @@ const mergeIncidents = (incidentsPerTypes) => {
 };
 
 /**
+ * Get incidents from the cache
+ *
+ * @returns {Array<object>} array of incidents
+ */
+exports.getIncidentsFromCache = () => {
+  const value = cache.get("incidents");
+  return value || [];
+};
+
+/**
  * Get incidents for all types
  *
- * @returns {Promise<object>} array of incidents
+ * @returns {Promise<Array<object>>} array of incidents
  */
 exports.getIncidents = () => {
   return new Promise((resolve, reject) => {
     Promise.all(incidentTypes.map((type) => getIncidentsPerType(type)))
       .then((incidentsPerTypes) => {
-        resolve(mergeIncidents(incidentsPerTypes));
+        return mergeIncidents(incidentsPerTypes);
+      })
+      .then((incidents) => {
+        cache.set("incidents", incidents);
+        resolve(incidents);
       })
       .catch((error) => {
         reject(error);
